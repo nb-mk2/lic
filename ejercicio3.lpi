@@ -1,100 +1,574 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<CONFIG>
-  <ProjectOptions>
-    <Version Value="11"/>
-    <PathDelim Value="\"/>
-    <General>
-      <SessionStorage Value="InProjectDir"/>
-      <MainUnit Value="0"/>
-      <Title Value="ejercicio3"/>
-      <ResourceType Value="res"/>
-      <UseXPManifest Value="True"/>
-      <Icon Value="0"/>
-    </General>
-    <i18n>
-      <EnableI18N LFM="False"/>
-    </i18n>
-    <BuildModes Count="1">
-      <Item1 Name="Default" Default="True"/>
-    </BuildModes>
-    <PublishOptions>
-      <Version Value="2"/>
-    </PublishOptions>
-    <RunParams>
-      <FormatVersion Value="2"/>
-      <Modes Count="1">
-        <Mode0 Name="default"/>
-      </Modes>
-    </RunParams>
-    <RequiredPackages Count="1">
-      <Item1>
-        <PackageName Value="LCL"/>
-      </Item1>
-    </RequiredPackages>
-    <Units Count="6">
-      <Unit0>
-        <Filename Value="ejercicio3.lpr"/>
-        <IsPartOfProject Value="True"/>
-      </Unit0>
-      <Unit1>
-        <Filename Value="unit1.pas"/>
-        <IsPartOfProject Value="True"/>
-        <ComponentName Value="Form1"/>
-        <HasResources Value="True"/>
-        <ResourceBaseClass Value="Form"/>
-        <UnitName Value="Unit1"/>
-      </Unit1>
-      <Unit2>
-        <Filename Value="tipos.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="Tipos"/>
-      </Unit2>
-      <Unit3>
-        <Filename Value="listasarreglos.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="Listasarreglos"/>
-      </Unit3>
-      <Unit4>
-        <Filename Value="listaspunteros.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="Listaspunteros"/>
-      </Unit4>
-      <Unit5>
-        <Filename Value="tad_cursores.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="TAD_cursores"/>
-      </Unit5>
-    </Units>
-  </ProjectOptions>
-  <CompilerOptions>
-    <Version Value="11"/>
-    <PathDelim Value="\"/>
-    <Target>
-      <Filename Value="ejercicio3"/>
-    </Target>
-    <SearchPaths>
-      <IncludeFiles Value="$(ProjOutDir)"/>
-      <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
-    </SearchPaths>
-    <Linking>
-      <Options>
-        <Win32>
-          <GraphicApplication Value="True"/>
-        </Win32>
-      </Options>
-    </Linking>
-  </CompilerOptions>
-  <Debugging>
-    <Exceptions Count="3">
-      <Item1>
-        <Name Value="EAbort"/>
-      </Item1>
-      <Item2>
-        <Name Value="ECodetoolError"/>
-      </Item2>
-      <Item3>
-        <Name Value="EFOpenError"/>
-      </Item3>
-    </Exceptions>
-  </Debugging>
-</CONFIG>
+unit Unit1;
+
+{$mode objfpc}{$H+}
+
+interface
+
+uses
+  Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
+  ExtCtrls, Listasarreglos, tipos;
+
+type
+
+  { TForm1 }
+
+  TForm1 = class(TForm)
+    Button1: TButton;
+    Button2: TButton;
+    Button3: TButton;
+    ButtonNomApeListadoTotal: TButton;
+    ButtonAprobAmbasMatClick: TButton;
+    ButtonOrdenarLista: TButton;
+    ButtonInfoApro: TButton;
+    ButtonMostrarApro: TButton;
+    ButtonComparaLst: TButton;
+    ButtonEliminaXApe: TButton;
+    ButtonLimpiar: TButton;
+    ButtonEliminar: TButton;
+    ButtonAgregar: TButton;
+    ButtonMostrar: TButton;
+    ButtonSalir: TButton;
+    EditNombre: TEdit;
+    EditApellido: TEdit;
+    EditNota: TEdit;
+    Image1: TImage;
+    Label1: TLabel;
+    Label2: TLabel;
+    Label3: TLabel;
+    ListBox1: TListBox;
+    RadioButtonEdya: TRadioButton;
+    RadioButtonOrg: TRadioButton;
+    RadGrup: TRadioGroup;
+    procedure Button1Click(Sender: TObject);
+    procedure Button2Click(Sender: TObject);
+    procedure Button3Click(Sender: TObject);
+    procedure ButtonAprobAmbasMatClickClick(Sender: TObject);
+    procedure ButtonInfoAproClick(Sender: TObject);
+    procedure ButtonComparaLstClick(Sender: TObject);
+    procedure ButtonEliminaXApeClick(Sender: TObject);
+    procedure ButtonAgregarClick(Sender: TObject);
+    procedure ButtonEliminarClick(Sender: TObject);
+    procedure ButtonLimpiarClick(Sender: TObject);
+    procedure ButtonMostrarAproClick(Sender: TObject);
+    procedure ButtonMostrarClick(Sender: TObject);
+    procedure ButtonNomApeListadoTotalClick(Sender: TObject);
+    procedure ButtonSalirClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure ListBox1Click(Sender: TObject);
+  private
+    { private declarations }
+  public
+    { public declarations }
+
+  end;
+
+var
+  Form1: TForm1;
+  listaEdya, listaOrg ,listaEdyaApro , listaOrgApro, listaEdyaOrgApro ,listaMerge, listaTotalAlumnos:lista;
+
+implementation
+
+{$R *.lfm}
+
+{ TForm1 }
+
+function esta(x:TipoElemento; lista:Lista):Boolean;
+var
+  p:posicion_lista;
+  y:TipoElemento;
+begin
+     esta:=false;
+     p:=lista.Inicio;
+     While (p <> Nulo) and (esta <> true) do
+      begin
+           lista.Recuperar(p,y);
+           if (x.CompararTE(y, campo1)=igual) then
+              esta:=true
+           else
+              p:=lista.Siguiente(p);
+      end;
+end;
+
+procedure TForm1.FormCreate(Sender: TObject);   //SE CREAN LAS LISTAS EN LA APERTURA DEL FORMULARIO
+begin
+   listaEdya.Crearvacia;
+   listaOrg.Crearvacia;
+   listaEdyaApro.Crearvacia;
+   listaOrgApro.Crearvacia;
+   listaEdyaOrgApro.Crearvacia;
+   listaTotalAlumnos.Crearvacia;
+end;
+
+procedure generarAprobados(var lista:lista; listaAux:lista);  //GENERA LISTA DE ALUMNOS APROBADOS
+var
+  x:Tipoelemento;
+  p:Posicion_lista;
+begin
+   lista.Crearvacia;
+   p:=listaAux.Inicio;
+  while p <> Nulo do
+      begin
+         listaAux.Recuperar(p,x);
+         if x.DR >= 6 then
+            lista.Agregar(x);
+         p:=listaAux.Siguiente(p);
+      end;
+end;
+
+procedure promedio(var lista: lista);
+var x,y:tipoelemento;
+  suma,cont:real;
+  p:posicion_lista;
+begin
+  if lista.esvacia() then
+     showmessage('Lista Vacia')
+  else
+     begin
+       p:=lista.inicio;
+       while (p <> nulo) do
+           begin
+              lista.recuperar(p,y);
+              suma:=suma+y.DR;
+              p:=lista.siguiente(p);
+              cont:=cont+1;
+           end;
+       Form1.ListBox1.items.add('Promedio Notas: '+floattostr(suma/cont));
+     end;
+end;
+
+
+procedure mayormenor(lista: lista);
+var y:tipoelemento;
+  estudiantemayor,estudiantemenor:string;
+  notamenor,notamayor:real;
+  p:posicion_lista;
+begin
+  if lista.esvacia() then
+     showmessage('Lista Vacia')
+  else
+     begin
+       p:=lista.inicio;
+       notamenor:=11;
+       notamayor:=0;
+       while (p <> nulo) do
+           begin
+              lista.recuperar(p,y);
+              if (y.DR<=notamenor) then
+                 begin
+                   notamenor:=y.dr;
+                   estudiantemenor:=y.ds;
+                 end;
+              if (y.DR>=notamayor) then
+                   begin
+                   notamayor:=y.dr;
+                   estudiantemayor:=y.ds;
+                   end;
+              p:=lista.siguiente(p);
+           end;
+       Form1.ListBox1.items.add('Estudiante con Menor nota: '+estudiantemenor+', : '+floattostr(notamenor));
+       Form1.ListBox1.items.add('Estudiante con Mayor nota: '+estudiantemayor+', : '+floattostr(notamayor));
+     end;
+end;
+
+procedure cargaOrdenada(var lista: lista);  //CARGA ORDENADA DE LAS LISTAS
+ var
+    x,y:TipoElemento;
+    nota:real;
+    condicion:longint = 0;
+    p: Posicion_lista;
+    agregado: Boolean;
+begin
+agregado:= false;
+     x.DS:= Form1.editNombre.Text + Form1.editApellido.Text;
+     Val(Form1.editNota.Text,nota,condicion);
+     // val = el valor de nota lo asignamos a promedio, y condicion es 0 para no error, y mayor a 0 cuando arroja error.
+     if condicion = 0 then
+        if (nota > 10) Or (nota < 0) then
+           showmessage('La nota tiene que estar entre 0 y 10')
+        else
+           begin
+           x.DR:=nota;
+           if  lista.Esvacia() then
+               lista.Agregar(x)
+           else
+               begin
+                    p:=lista.Inicio;
+                    while ((p <> Nulo) and (not agregado)) do
+                          begin
+                               lista.Recuperar(p,y);
+                               if (x.CompararTE(y, campo1)=menor) then
+                                  p:=lista.Siguiente(p)
+                               else
+                                   begin
+                                        lista.Insertar(x,p);
+                                        agregado:= true;
+                                   end;
+                          end;
+                    if not agregado then
+                       lista.Agregar(x);
+               end;
+           end
+     else
+        showmessage('Se produjo un error con la nota');
+
+end;
+
+procedure cargaEdyaOrgApro(var lista: lista);  //CARGA LISTA APROBADOS EDYA Y ORG
+ var
+    x,y:TipoElemento;
+    nota:real;
+    condicion:longint = 0;
+    p: Posicion_lista;
+    agregado: Boolean;
+begin
+agregado:= false;
+     if (Form1.RadioButtonEdya.checked=true) then
+         x.DS:= Form1.editNombre.Text + Form1.editApellido.Text +':  Edya'
+         else
+         x.DS:= Form1.editNombre.Text + Form1.editApellido.Text +':  Org';
+
+     Val(Form1.editNota.Text,nota,condicion);
+     // val = el valor de nota lo asignamos a promedio, y condicion es 0 para no error, y mayor a 0 cuando arroja error.
+     if condicion = 0 then
+        if (nota > 10) Or (nota < 0) then
+           showmessage('La nota tiene que estar entre 0 y 10')
+        else
+           begin
+           x.DR:=nota;
+           if x.DR >=6 then
+            begin
+             if  lista.Esvacia() then
+                 lista.Agregar(x)
+             else
+                 begin
+                      p:=lista.Inicio;
+                      while ((p <> Nulo) and (not agregado)) do
+                            begin
+                                 lista.Recuperar(p,y);
+                                 if (x.CompararTE(y, campo1)=menor) then
+                                    p:=lista.Siguiente(p)
+                                 else
+                                     begin
+                                          lista.Insertar(x,p);
+                                          agregado:= true;
+                                     end;
+                            end;
+                      if not agregado then
+                         lista.Agregar(x);
+                 end;
+           end;
+           end
+     else
+        showmessage('Se produjo un error con la nota');
+
+end;
+
+procedure mostrarLista(lista:lista);
+ var
+     x:TipoElemento;
+     estudiante:string;
+     p: Posicion_lista;
+begin
+     p:=lista.Final;
+     while p <> Nulo do
+      begin
+           lista.Recuperar(p,x);
+           estudiante:= x.DS;
+           Form1.ListBox1.items.add('Nombre y Apellido: '+estudiante);
+           Str(x.DR:2:2, estudiante);
+           Form1.ListBox1.items.add('Nota: '+estudiante);
+           p:= lista.Anterior(p);
+      end;
+     Str(lista.q_item, estudiante);
+     Form1.ListBox1.items.add('Cantidad de alumnos inscriptos: '+estudiante)
+end;
+
+procedure eliminarAlumno (var lista:lista); //ELIMINAR ELUMNO DE UNA MATERIA EN PARTICULAR
+var
+    x,y:TipoElemento;
+    p: Posicion_lista;
+    eliminado: Boolean;
+begin
+    eliminado:= false;
+    x.ds:= Form1.editNombre.Text + Form1.editApellido.Text;
+    if  lista.Esvacia() then
+       showmessage('No hay nada para eliminar')
+    else
+       begin
+         p:=lista.Inicio;
+         while ((p <> Nulo) and (not eliminado)) do
+            begin
+                 lista.Recuperar(p,y);
+                 if (x.CompararTE(y, campo1)=igual) then
+                     begin
+                          lista.Eliminar(p);
+                          eliminado:= true;
+                     end
+                 else
+                     p:=lista.Siguiente(p)
+            end;
+         if not eliminado then
+          showmessage('No se ha encontrado coincidencia')
+       end;
+end;
+
+
+procedure eliminarAlumnoRepetido (var lista:lista); //ELIMINAR  REPETIDO
+var
+    x,y:TipoElemento;
+    p: Posicion_lista;
+    eliminado: Boolean;
+    px,py: Posicion_lista;
+begin
+       px:=lista.Inicio;
+       py:=lista.Inicio;
+          showmessage(inttostr(px));
+          while px <> Nulo do
+              begin
+                    lista.Recuperar(px,x);
+                    py:=lista.Siguiente(px);
+                    showmessage(inttostr(py)+'PY');
+                    while py <> Nulo do
+                      begin
+                       lista.Recuperar(py,y);
+                            if (x.CompararTE(y, campo1)=igual) then
+                              begin
+                               lista.Eliminar(px);
+                               py:=lista.Inicio;
+                               //px:=lista.Inicio;
+                              end;
+                             py:=lista.Siguiente(py);
+                             showmessage(inttostr(py)+'PY2');
+                       end;
+                    px:=lista.Siguiente(px);
+              end;
+end;
+
+procedure eliminarAlumnoPorApellidos (var lista:lista); //ELIMINA TODOS LOS ALUMNOS QUE UN APELLIDO EN PARTICULAR DE TODA LA MATERIA
+var
+    x,y:TipoElemento;
+    p,paux: Posicion_lista;
+    apellido:string;
+    esta: boolean;
+begin
+    y.ds:= Form1.editApellido.Text;
+
+    if  lista.Esvacia() then
+       showmessage('No hay nada para eliminar')
+    else
+       begin
+         p:=lista.Inicio;
+         esta:=false;
+         while (p <> Nulo) do
+            begin
+                 lista.Recuperar(p,x);
+                 if (y.CompararTE(x, campo1)=igual)then
+                    begin
+                    lista.Eliminar(p);
+                    showmessage(inttostr(p));
+                    p:=lista.Inicio;    //Inicialisamos la lista
+                    end
+                 else
+                   begin
+                   p:=lista.Siguiente(p);
+                   showmessage('elsee');
+                   showmessage(inttostr(p));
+                   end;
+
+
+            end;
+
+       end;
+end;
+
+
+procedure TForm1.ButtonAprobAmbasMatClickClick(Sender: TObject);  //Alumnos que APROBARON Estructura y Org
+var
+    listasiguales: boolean;
+    x,y:TipoElemento;
+    px,py: Posicion_lista;
+begin
+          generarAprobados(listaEdyaApro, listaEdya);
+          generarAprobados(listaOrgApro, listaOrg);
+          px:=listaEdyaApro.Inicio;
+          //showmessage(inttostr(px));
+          while px <> Nulo do
+              begin
+                   listaEdyaApro.Recuperar(px,x);
+                    py:=listaOrgApro.Inicio;
+                    // showmessage(inttostr(py));
+                    while py <> Nulo do
+                      begin
+                       listaOrgApro.Recuperar(py,y);
+                       if (x.CompararTE(y, campo1)=igual) then
+                           Form1.ListBox1.items.add('Aprobaron ambas Materias = Nombre y Apellido: '+y.ds);
+                       py:=listaOrgApro.Siguiente(py);
+                       showmessage(inttostr(py));
+                       end;
+                     px:=listaEdyaApro.Siguiente(px);
+              end;
+
+end;
+
+procedure TForm1.ListBox1Click(Sender: TObject);
+begin
+
+end;
+
+procedure TForm1.ButtonSalirClick(Sender: TObject);
+begin
+  form1.Close;
+end;
+
+procedure TForm1.ButtonAgregarClick(Sender: TObject);  //Boton AGREGAR, validamos a que materia corresponde
+begin
+  if (RadioButtonEdya.checked=true) then
+     cargaOrdenada(listaEdya);
+  if (RadioButtonOrg.checked=true) then
+     cargaOrdenada(listaOrg);
+   cargaEdyaOrgApro(listaEdyaOrgApro);
+   cargaOrdenada(listaTotalAlumnos);
+
+end;
+
+procedure TForm1.ButtonEliminaXApeClick(Sender: TObject);
+begin
+   if RadioButtonEdya.Checked=true then
+      eliminarAlumnoPorApellidos(listaEdya);
+   if RadioButtonOrg.Checked=true then
+      eliminarAlumnoPorApellidos(listaOrg);
+end;
+
+procedure TForm1.ButtonComparaLstClick(Sender: TObject);
+var
+    listasiguales: boolean;
+    x,y:TipoElemento;
+    px,py: Posicion_lista;
+begin
+  listasiguales:= False;
+  if listaEdya.q_item=listaOrg.q_item then
+     begin
+          listasiguales:= True;
+          px:=listaEdya.Inicio;
+          py:=listaOrg.Inicio;
+          while ((Px <> Nulo) and listasiguales) do
+              begin
+                   listaEdya.Recuperar(px,x);
+                   listaOrg.Recuperar(py,y);
+                   if (x.CompararTE(y, campo1y3)<>igual) then
+                      listasiguales:= false;
+                   px:=listaEdya.Siguiente(px);
+                   py:=listaOrg.Siguiente(py);
+              end;
+     end;
+  if listasiguales then
+     showmessage('Listas Iguales')
+  else
+     showmessage('Listas Distintas')
+end;
+
+procedure TForm1.ButtonInfoAproClick(Sender: TObject);
+var x,y: tipoelemento;
+    p,paux:posicion_lista;
+    estudiante: string;
+begin
+  mostrarLista(listaEdyaOrgApro);
+  { p:=listaedya.Inicio;
+   while p <> nulo do
+       begin
+           paux:=listaorg.inicio;
+           listaedya.recuperar(p,x);
+           while paux <> nulo do
+           begin
+              listaorg.recuperar(paux,y);
+              if ((x.CompararTE(y, campo1)=igual) and (x.DR >=6) and (y.DR >=6)) then
+                 begin
+                  estudiante:= x.DS;
+                  Form1.ListBox1.items.add('Alumno aprobados en ambas materias: '+estudiante)
+                 end;
+                paux:=listaorg.Siguiente(paux);
+           end;
+           p:=listaedya.Siguiente(p);
+       end;  }
+end;
+
+procedure TForm1.Button1Click(Sender: TObject);
+var
+   picture1: TPicture;
+   i: integer;
+   FileVar: TextFile;
+   p: posicion_lista;
+   si,anterior: string;
+   links: string;
+   x,y: tipoelemento;
+begin
+   listaEdya.graficar(Form1.Image1);
+end;
+
+procedure TForm1.Button2Click(Sender: TObject);
+begin
+  if RadioButtonEdya.Checked=true then
+   mayormenor(listaEdya);
+  if RadioButtonOrg.Checked=true then
+   mayormenor(listaOrg);
+end;
+
+procedure TForm1.Button3Click(Sender: TObject);
+begin
+  if RadioButtonEdya.Checked=true then
+   promedio(listaEdya);
+  if RadioButtonOrg.Checked=true then
+   promedio(listaOrg);
+end;
+
+procedure TForm1.ButtonEliminarClick(Sender: TObject);
+begin
+  if RadioButtonEdya.Checked=true then
+   eliminarAlumno(listaEdya);
+  if RadioButtonOrg.Checked=true then
+   eliminarAlumno(listaOrg);
+
+end;
+
+procedure TForm1.ButtonLimpiarClick(Sender: TObject);
+begin
+  Form1.ListBox1.Clear;
+end;
+
+
+procedure TForm1.ButtonMostrarAproClick(Sender: TObject);
+begin
+     if RadioButtonEdya.Checked=true then
+        begin
+             generarAprobados(listaEdyaApro, listaEdya);
+             mostrarLista(listaEdyaApro);
+        end;
+
+     if RadioButtonOrg.Checked=true then
+        begin
+             generarAprobados(listaOrgApro, listaOrg);
+             mostrarLista(listaOrgApro);
+        end;
+
+end;
+
+procedure TForm1.ButtonMostrarClick(Sender: TObject);
+begin
+   if RadioButtonEdya.Checked = true then
+      mostrarLista(listaEdya);
+   if RadioButtonOrg.Checked = true then
+      mostrarLista(listaOrg);
+
+
+end;
+
+procedure TForm1.ButtonNomApeListadoTotalClick(Sender: TObject);
+begin
+   eliminarAlumnoRepetido(listaTotalAlumnos);
+   mostrarLista(listaTotalAlumnos);
+end;
+
+
+
+
+end.
