@@ -1,95 +1,208 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<CONFIG>
-  <ProjectOptions>
-    <Version Value="11"/>
-    <PathDelim Value="\"/>
-    <General>
-      <SessionStorage Value="InProjectDir"/>
-      <MainUnit Value="0"/>
-      <Title Value="proyecto_parcial"/>
-      <ResourceType Value="res"/>
-      <UseXPManifest Value="True"/>
-    </General>
-    <i18n>
-      <EnableI18N LFM="False"/>
-    </i18n>
-    <BuildModes Count="1">
-      <Item1 Name="Default" Default="True"/>
-    </BuildModes>
-    <PublishOptions>
-      <Version Value="2"/>
-    </PublishOptions>
-    <RunParams>
-      <FormatVersion Value="2"/>
-      <Modes Count="1">
-        <Mode0 Name="default"/>
-      </Modes>
-    </RunParams>
-    <RequiredPackages Count="1">
-      <Item1>
-        <PackageName Value="LCL"/>
-      </Item1>
-    </RequiredPackages>
-    <Units Count="5">
-      <Unit0>
-        <Filename Value="proyecto_parcial.lpr"/>
-        <IsPartOfProject Value="True"/>
-      </Unit0>
-      <Unit1>
-        <Filename Value="primer_parcial.pas"/>
-        <IsPartOfProject Value="True"/>
-        <ComponentName Value="Form1"/>
-        <HasResources Value="True"/>
-        <ResourceBaseClass Value="Form"/>
-        <UnitName Value="Primer_Parcial"/>
-      </Unit1>
-      <Unit2>
-        <Filename Value="listaspunteros.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="Listaspunteros"/>
-      </Unit2>
-      <Unit3>
-        <Filename Value="pilaspunteros.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="Pilaspunteros"/>
-      </Unit3>
-      <Unit4>
-        <Filename Value="librerias\colapunteros.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="Colapunteros"/>
-      </Unit4>
-    </Units>
-  </ProjectOptions>
-  <CompilerOptions>
-    <Version Value="11"/>
-    <PathDelim Value="\"/>
-    <Target>
-      <Filename Value="proyecto_parcial"/>
-    </Target>
-    <SearchPaths>
-      <IncludeFiles Value="$(ProjOutDir)"/>
-      <OtherUnitFiles Value="librerias"/>
-      <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
-    </SearchPaths>
-    <Linking>
-      <Options>
-        <Win32>
-          <GraphicApplication Value="True"/>
-        </Win32>
-      </Options>
-    </Linking>
-  </CompilerOptions>
-  <Debugging>
-    <Exceptions Count="3">
-      <Item1>
-        <Name Value="EAbort"/>
-      </Item1>
-      <Item2>
-        <Name Value="ECodetoolError"/>
-      </Item2>
-      <Item3>
-        <Name Value="EFOpenError"/>
-      </Item3>
-    </Exceptions>
-  </Debugging>
-</CONFIG>
+unit Primer_Parcial;
+
+{$mode objfpc}{$H+}
+
+interface
+
+uses
+  Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls,
+  ExtCtrls, Calendar, DateUtils, EditBtn, Menus, ActnList, tipos, Listasarreglos, pilaspunteros, colapunteros;
+
+type
+
+  { TForm1 }
+
+  TForm1 = class(TForm)
+    Button1: TButton;
+    Button2: TButton;
+    Button3: TButton;
+    Button4: TButton;
+    Calendar1: TCalendar;
+    ComboBox1: TComboBox;
+    ComboBox2: TComboBox;
+    FileNameEdit1: TFileNameEdit;
+    GroupBox2: TGroupBox;
+    Label1: TLabel;
+    Label2: TLabel;
+    Label3: TLabel;
+    ListBox1: TListBox;
+    RadioButton_Archivo: TRadioButton;
+    RadioButton_Variables: TRadioButton;
+    RadioButton_PF: TRadioButton;
+    RadioGroup1: TRadioGroup;
+
+
+    procedure Button2Click(Sender: TObject);
+
+    procedure ComboBox2Change(Sender: TObject);
+    procedure FileNameEdit1Change(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+
+
+  private
+    { private declarations }
+  public
+    { public declarations }
+  end;
+
+var
+  Form1: TForm1;
+  Lista_Codigo,lista_archivos:Lista;
+  pilainvertir:pila;
+  conexion:real;
+  pilaaux:pila;
+  col:cola;
+
+implementation
+
+{$R *.lfm}
+
+
+{ TForm1 }
+
+procedure TForm1.FormCreate(Sender: TObject);
+begin
+  lista_codigo.Crearvacia;
+  lista_archivos.Crearvacia;
+  pilainvertir.Crearvacia;
+  col.Crearvacia;
+end;
+
+procedure cargardatos(var lista_contenido:Lista;var lista_archivos:Lista;var pil:pila;prioridad:string;fecha:Tdate; col:cola);     // Procedimiento que agrega c/linea del archivo a la lista.
+var x,y:TipoElemento; //x= archivos, y= contenidos.
+    archivo:textfile;
+    i:integer;
+begin
+
+  //Nombre
+  x.DS:=form1.FileNameEdit1.FileName;
+
+  //Prioridad
+  case prioridad of
+        'Alta':x.DN:=1;
+        'Por encima de lo Normal':x.DN:=2;
+        'Normal':x.DN:=3;
+        'Por debajo de lo Normal':x.DN:=4;
+        'Baja':x.DN:=5;
+  end;
+
+  //Fecha
+  x.DV:=fecha;
+
+  //conexion archivo
+  x.DR:=conexion;
+
+  //Cargar contenido del HTML a la lista
+  assign(archivo,x.DS);
+  reset(archivo);
+  if lista_archivos.Esllena then
+     showmessage('No se puede agregar mas archivos a la lista!')
+  else
+      begin
+         i:=1;
+         lista_archivos.agregar(x);
+         while not eof(archivo)  do        //Recorro el archivo hasta el final del mismo
+            begin
+                 ReadLn(archivo,y.DS);
+                 //if (pos(' ',y.DS)>0) then
+                 if (y.ds <> '') then
+                    begin
+                        y.DN:=i;
+                        y.DR:=conexion;
+                        lista_contenido.Agregar(y);
+                        pil.Apilar(y);
+                        col.Encolar(y);
+                    end;
+                 i:=i+1;
+            end;
+        Close(archivo);
+        showmessage('Archivo agregado éxitosamente');
+      end;
+end;
+
+procedure TForm1.FileNameEdit1Change(Sender: TObject);
+begin
+
+end;
+
+procedure palabrasrepetidas(Lista_Auxiliar:Lista;lista_archivos:lista;nombrearchivo:string);
+var
+py,px: Posicion_lista;
+    x,y:TipoElemento;
+
+    contar:integer;
+begin
+          px := Lista_Auxiliar.Inicio;
+                      while px <> 0 do
+                      begin
+                        Lista_Auxiliar.Recuperar(px, x);
+                            py := Lista_Auxiliar.Siguiente(px);
+                            while py <> 0 do
+                            begin
+                              Lista_Auxiliar.Recuperar(py, y);
+                              if x.CompararTE(y, campo1) = igual then
+                              begin
+                               contar:=contar+1;
+                               showmessage(inttostr(contar));
+                               py := Lista_Auxiliar.Siguiente(px); // actualizamos el siguiente
+                              end
+                              else
+                              begin
+                                py := Lista_Auxiliar.Siguiente(py);
+                              end;
+                            end;
+                            px := Lista_Auxiliar.Siguiente(px);
+                      end;
+end;
+
+procedure mostraretiquetas(Lista_Auxiliar:Lista;lista_archivos:lista;nombrearchivo:string);
+var
+    x,y:TipoElemento;
+    p,a: Posicion_lista;
+    contador:integer;
+begin
+
+   form1.ListBox1.Clear;
+   p:=Lista_archivos.Inicio;
+   a:=Lista_Auxiliar.Inicio;
+   while(p <> 0) do
+      begin
+           Lista_archivos.Recuperar(p,x);
+           if x.DS=nombrearchivo then
+              begin
+                     Form1.ListBox1.items.add('Nombre completo: '+x.DS);
+                     Form1.ListBox1.items.add('Prioridad: '+inttostr(x.DN));
+                     Form1.ListBox1.items.add('Fecha de creación:'+datetostr(x.DV));
+                     Form1.ListBox1.items.add(' ');
+                     while (a <> 0) do
+                     begin
+                          Lista_Auxiliar.Recuperar(a,y);
+                          if x.DR=y.DR then
+                          begin
+                               form1.listbox1.items.add('Línea: '+inttostr(y.DN)+': '+y.DS);
+                          end;
+                          a:= Lista_Auxiliar.Siguiente(a);
+                     end;
+              end;
+           p:= Lista_archivos.Siguiente(p);
+      end;
+end;
+
+
+procedure TForm1.Button2Click(Sender: TObject);
+begin
+  cargardatos(Lista_Codigo,lista_archivos,pilainvertir,form1.ComboBox1.text,form1.Calendar1.DateTime,col);
+  form1.ComboBox2.items.add(form1.FileNameEdit1.text);
+  conexion:=conexion+1;
+end;
+
+
+procedure TForm1.ComboBox2Change(Sender: TObject);
+var nombrearchivo:string;
+begin
+  nombrearchivo:=form1.ComboBox2.text;
+    if form1.RadioButton_Archivo.Checked then
+     mostraretiquetas(Lista_Codigo,lista_archivos,nombrearchivo);
+end;
+
+end.
